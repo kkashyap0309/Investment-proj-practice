@@ -1,7 +1,6 @@
 import { useState } from "react";
 import InputBox from "./InputBox";
 import InvestmentBreakUp from "./InvestmentBreakUp.jsx";
-import { calculateInvestmentResults } from "../util/investment.js";
 export default function UserInput() {
   const [inputBoxData, setInputBoxData] = useState({});
   function handleInputboxChange(inputBoxNameAndValue) {
@@ -14,32 +13,16 @@ export default function UserInput() {
     });
   }
 
-  let finalResult = null;
+  let showInvestmentBreakup = false;
   {
     if (
-      inputBoxData.initialInvestment != undefined &&
-      inputBoxData.duration != undefined &&
-      inputBoxData.annualInvestment != undefined &&
-      inputBoxData.expectedReturn != undefined
+      inputBoxData.initialInvestment != undefined && inputBoxData.initialInvestment > 0 &&
+      inputBoxData.duration != undefined &&  inputBoxData.duration > 0 &&
+      inputBoxData.annualInvestment != undefined && 
+      inputBoxData.expectedReturn != undefined && inputBoxData.expectedReturn > 0
     ) {
-      const result = calculateInvestmentResults(inputBoxData);
-      finalResult = evaluateDataFromResult(result);
-      console.log("calculated result =>  " + finalResult);
+      showInvestmentBreakup = true;
     }
-  }
-
-  function evaluateDataFromResult(calculatedResult) {
-    let totIntrest = 0;
-    return calculatedResult.map((res) => {
-      const { interest } = res;
-      totIntrest += interest;
-
-      return {
-        ...res,
-        totalIntrest: totIntrest,
-        investedCapital: inputBoxData.initialInvestment,
-      };
-    });
   }
 
   return (
@@ -88,10 +71,10 @@ export default function UserInput() {
           />
         </div>
       </div>
-      {finalResult !== null ? (
-        <InvestmentBreakUp results={finalResult} />
+      {showInvestmentBreakup ? (
+        <InvestmentBreakUp inputValues={inputBoxData} />
       ) : (
-        <></>
+        <p className="center">Input cannot be less than zero!</p>
       )}
     </>
   );
